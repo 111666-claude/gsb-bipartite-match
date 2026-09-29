@@ -19,11 +19,11 @@ go run ./cmd/bipartite-match --edges 'l1-r1,l1-r2,l2-r1' --cover
 - 不变量：配对的左右顶点两两不同；匹配大小 ≤ 两侧顶点数；`cover` 必须覆盖每一条边；`|cover| == matching`。
 - 规模：两侧各 1 万点、10 万条边要在 3 秒内出结果（用 Hopcroft-Karp 的 O(E√V)），内存 O(V+E)。
 
-## 现在的行为
+## 实现
 
-- `MaxMatching` 对每个左侧顶点只挑第一条还没被占用的边，不做增广：上面的样例给 `matching=1`（应 2）。
-- `MinVertexCover` 返回 `ErrNoCover`，`--cover` 直接失败。
-- `ParseEdges` 不校验顶点名，缺 `-` 只给一句笼统错误，没有边的下标。
+- `MaxMatching` 用 Hopcroft-Karp（O(E√V)）求最大匹配，配对按字典序输出。
+- `MinVertexCover` 用 König 定理：从未匹配的左侧顶点出发走交替路标记可达集 Z，覆盖集为 (L \ Z) ∪ (R ∩ Z)，按字典序输出。
+- `ParseEdges` 校验空顶点名、缺 `-`、重复边，报错带 1 起始的边序号。
 
 ## 计划新增的能力
 
@@ -37,7 +37,7 @@ go run ./cmd/bipartite-match --edges 'l1-r1,l1-r2,l2-r1' --cover
 ```
 matching=2
 pairs=l1-r2,l2-r1
-cover=l1,r1
+cover=l1,l2
 ```
 
 ## 目录
